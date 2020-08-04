@@ -93,10 +93,7 @@ If not, you can use the USGS NED for study areas within the United States or SRT
 
 ### 2.. Calculate and combine variables
 
-* NAIP - add NDVI, add year, etc
-* Sentinel - cloudy
 * Elevation data - we used ArcMap to gather and clean LiDAR data, if this is not available you could use SRTM or DEM USGS data. But we wanted 1.5 m data
-* 
 
 #### Topographic variables
 
@@ -153,6 +150,8 @@ var difference = ct.elevationDifference(maskedDEM,maskedDSM)
 ##### Forest-cropland
 ##### NDVI 45
 ##### Burn ratio
+* NAIP - add NDVI, add year, etc
+* Sentinel - cloudy
 
 
 ### 3. Set up and apply classification methods
