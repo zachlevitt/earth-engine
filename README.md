@@ -91,12 +91,6 @@ var dsm = ct.loadDSM()
 
 If not, you can use the USGS NED for study areas within the United States or SRTM data for global case studies. Add these to your script by searching for one of these datasets in the search bar and clicking the **Import** button. It should appear at the top of your script under an **Imports** header and you can change the name to whatever you like. In this script, we will name our elevation data **```dem```**. You will not be able to include the ```dsm``` in your analysis.
 
-
-* cloudy
-* Our code will be broken down into two main files - modules and function calls that bring it all together
-
-
-
 ### 2.. Calculate and combine variables
 
 * NAIP - add NDVI, add year, etc
