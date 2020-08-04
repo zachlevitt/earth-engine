@@ -1,7 +1,7 @@
 ![](header.png "Image classification in Earth Engine")
 
 ## Image classification in Google Earth Engine with topographic and spectral variables
-[<span style="color:gray">**Zach Levitt**</span>](https://zachlevitt.github.io), '20.5 and [<span style="color:gray">**Jeff Howarth**</span>](https://jeffhowarth.github.io/)</span>, Associate Professor of Geography</br>
+[**Zach Levitt**](https://zachlevitt.github.io), '20.5 and [**Jeff Howarth**](https://jeffhowarth.github.io/), Associate Professor of Geography</br>
 Middlebury College, Vermont, USA
 
 ### Introduction
@@ -45,7 +45,7 @@ This tutorial will progress in four steps:
 	3. Visualization parameters
 	4. Export data?
 
-### Upload and/or import data
+### 1. Upload and/or import data
 
 To perform image classification with topographic variables, there are two necessary inputs:
 
@@ -59,19 +59,9 @@ To perform image classification with topographic variables, there are two necess
 
 In this tutorial, we utilize satellite imagery from Earth Engine and upload our own elevation data from LiDAR, which is not included in Earth Engine. 
 
-If you have available LiDAR data for your study region, you can upload a GeoTIFF as an asset to Earth Engine by clicking on the <span style="color:blue">**Assets**</span> tab, then the <span style="color:red">**New**</span> button, and upload your GeoTIFF. 
+If you have available LiDAR data for your study region, you can upload a GeoTIFF as an asset to Earth Engine by clicking on the **Assets** tab, then the **New** button, and upload your GeoTIFF. 
 
-If not, you can use the USGS NED for study areas within the United States or SRTM data for global case studies. Add these to your script by searching for one of these datasets in the search bar and clicking the <span style="color:blue">**Import**</span> button. It should appear at the top of your script under an **Imports** header and you can change the name to whatever you like. In this script, we will name our elevation data **```dem```**.
-
-
-<!-- ### Background
-
-There are two primary motiviations for this work:
-
-1. Apply machine learning approaches to identify vegetation classes using topographic, spectral and spatial variables.
-2. Update vegetation data for the Channel Islands to aid conservation and environmental projects (Last updated in [2007](http://iws.org/CISProceedings/7th_CIS_Proceedings/Cohen_et_al.pdf) for [Santa Cruz Island](https://map.dfg.ca.gov/metadata/ds0563.html), the largest of the Channel Islands).
- -->
-
+If not, you can use the USGS NED for study areas within the United States or SRTM data for global case studies. Add these to your script by searching for one of these datasets in the search bar and clicking the **Import** button. It should appear at the top of your script under an **Imports** header and you can change the name to whatever you like. In this script, we will name our elevation data **```dem```**.
 
 
 
@@ -98,16 +88,13 @@ There are two primary motiviations for this work:
 We calculated several topographic variables to include in our model:
 
 ##### **Slope**
-
-* Module
 ```javascript
+//Module function
 exports.calculateSlopeDegrees = function(dem,mask){
 	return ee.Terrain.slope(dem).mask(mask)
 }
 
-```
-* Script
-```javascript
+//Script
 var slopeDegrees = ct.calculateSlopeDegrees(maskedDEM,mask);
 ```
 ##### **Heat load index** (from Theobald et al, 2016)
@@ -145,6 +132,15 @@ var outScale = 1.5;
 var outCRS = 'EPSG:26911';
 var year = 2018;
 ``` -->
+
+<!-- ### Background
+
+There are two primary motiviations for this work:
+
+1. Apply machine learning approaches to identify vegetation classes using topographic, spectral and spatial variables.
+2. Update vegetation data for the Channel Islands to aid conservation and environmental projects (Last updated in [2007](http://iws.org/CISProceedings/7th_CIS_Proceedings/Cohen_et_al.pdf) for [Santa Cruz Island](https://map.dfg.ca.gov/metadata/ds0563.html), the largest of the Channel Islands).
+ -->
+
 
 
 
