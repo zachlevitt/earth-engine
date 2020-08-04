@@ -6,19 +6,19 @@ Middlebury College, Vermont, USA
 
 ### Introduction
 
-This tutorial will introduce a workflow for utilizing topographic, spectral and spatial variables to classifying remotely-sensed imagery using machine learning approaches in Google Earth Engine (GEE). Using a combination of pre-loaded GEE satellite imagery and analysis methods, as well as topographic variables derived from uploaded LiDAR data, we will outline a novel image classification methodology. We will apply these tools to classify vegetation on the Channel Islands of California, though the tools are applicable to a wide range of use cases. We will utilize both supervised and unsupervised classification methods to show various methods for improving the accuracy and efficiency of the workflow.
+This tutorial will introduce a workflow for classifying remotely-sensed imagery in Google Earth Engine (GEE) using machine learning models trained on topographic and spectral variables. Using a combination of pre-loaded GEE satellite imagery and analysis methods, as well as topographic variables derived from uploaded LiDAR data, we outline a novel image classification methodology. These methods are applied to a specific case study of classifying vegetation on the Channel Islands of California, though the tools are applicable to a wide range of use cases. We utilize both supervised and unsupervised classification methods to demonstrate various methods for improving the accuracy and efficiency of the workflow.
 
 ***Note regarding code structure***
 
-In order to increase the usability of our code, we will use modules to define functions that can be applied to any case study. You can read more about modules [here](https://medium.com/google-earth/making-it-easier-to-reuse-code-with-earth-engine-script-modules-2e93f49abb13). 
-
-The following tutorial will reference module functions defined [here](https://code.earthengine.google.com/9ef0eb7a802163ba97e51a94a754379d). To connect to the module functions, add this line at the top of your script:
+In order to increase the usability of our code, we use modules to define functions that can be applied to any case study. You can read more about modules [here](https://medium.com/google-earth/making-it-easier-to-reuse-code-with-earth-engine-script-modules-2e93f49abb13). The following tutorial will reference module functions defined [here](https://code.earthengine.google.com/9ef0eb7a802163ba97e51a94a754379d). To connect to the module functions, add this line at the top of your script:
 
 ```javascript
 var ct = require('users/zlevitt/chis:chisTools.js');
 ```
 
-The code snippets below will highlight the module function as well as the corresponding script code that calls the function. To follow along, you can either reference these functions in your script, or create your own module script. Click [**here**](https://code.earthengine.google.com/ba0f64848eddfbce06369aa8cdbe21be) to view the completed script applied to vegetation on Santa Cruz Island.
+You can reference these functions in your script or modify them to fit your context and create your own module script. The code snippets below are from the [**completed script**](https://code.earthengine.google.com/ba0f64848eddfbce06369aa8cdbe21be), which applies these methods to classify vegetation on Santa Cruz Island.
+
+If you have never used GEE before, here is a helpful place to start: [https://jeffhowarth.github.io/eeprimer/start/getGEE/](https://jeffhowarth.github.io/eeprimer/start/getGEE/)
 
 ### Overview
 
@@ -38,7 +38,7 @@ This tutorial will progress in four steps:
 		3. Run Random Forest classification
 	* Unsupervised?
 		1. Segmentation?
-		2. 
+		2. Other unsupervised methods?
 4. **Evaluate and visualize results**
 	1. Confusion matrix
 	2. Variable importance
@@ -49,66 +49,120 @@ This tutorial will progress in four steps:
 
 To perform image classification with topographic variables, there are two necessary inputs:
 
-1. **Satellite imagery** - National Agricultural Imagery Program (NAIP) or Sentinel
-	* NAIP imagery
-	* Sentinel imagery:
-	 ```javascript
-	 var sentinel = ct.loadSentinel(geometry,startDate,endDate,cloudPercentage);
-	 ```
-2. **Elevation data** - LiDAR, Shuttle Radar Topography Mission (SRTM), USGS National Elevation Dataset (NED)
+**Satellite imagery** - National Agricultural Imagery Program (NAIP) or Sentinel
+```javascript
+//Constants
+var outScale = 10;
+var outCRS = 'EPSG:32611'
+var startDateWinter = '2019-02-15';
+var endDateWinter = '2019-03-15';
+var startDateSummer = '2019-08-01';
+var endDateSummer = '2019-09-30';
+var cloudPercentage = 0.2;
 
-In this tutorial, we utilize satellite imagery from Earth Engine and upload our own elevation data from LiDAR, which is not included in Earth Engine. 
+//We will utilize two time periods for Sentinel data
+var sentinelWinter = ct.loadSentinel(extent,startDateWinter,endDateWinter,cloudPercentage);
+var sentinelSummer = ct.loadSentinel(extent,startDateSummer,endDateSummer,cloudPercentage);
+```
 
-If you have available LiDAR data for your study region, you can upload a GeoTIFF as an asset to Earth Engine by clicking on the **Assets** tab, then the **New** button, and upload your GeoTIFF. 
+**Elevation data** - LiDAR, Shuttle Radar Topography Mission (SRTM), USGS National Elevation Dataset (NED)
 
-If not, you can use the USGS NED for study areas within the United States or SRTM data for global case studies. Add these to your script by searching for one of these datasets in the search bar and clicking the **Import** button. It should appear at the top of your script under an **Imports** header and you can change the name to whatever you like. In this script, we will name our elevation data **```dem```**.
+In this tutorial, we our own elevation data from LiDAR, which is not included in Earth Engine. If you have available LiDAR data for your study region, you can upload GeoTIFFs as assets to Earth Engine by clicking on the **Assets** tab, then the **New** button, and upload your GeoTIFF. 
+
+```javascript
+var dem = ct.loadDEM()
+    .reduceResolution({ // Force the next reprojection to aggregate instead of resampling.
+      reducer: ee.Reducer.mean(),
+      maxPixels: 1024
+    }).reproject({ // Request the data at the scale and projection of the MODIS image.
+      crs: outCRS,
+      scale: outScale
+});
+
+var dsm = ct.loadDSM()
+    .reduceResolution({
+      reducer: ee.Reducer.mean(),
+      maxPixels: 1024
+    }).reproject({
+      crs: outCRS,
+      scale: outScale
+});
+```
+
+If not, you can use the USGS NED for study areas within the United States or SRTM data for global case studies. Add these to your script by searching for one of these datasets in the search bar and clicking the **Import** button. It should appear at the top of your script under an **Imports** header and you can change the name to whatever you like. In this script, we will name our elevation data **```dem```**. You will not be able to include the ```dsm``` in your analysis.
 
 
-
-* We will reproject to ....
-* Define variables like number of classes, bands, scale, etc
-* projection if naip, or sentinel 
 * cloudy
-* If you have never used GEE before, here is a helpful place to start [https://jeffhowarth.github.io/eeprimer/start/getGEE/](https://jeffhowarth.github.io/eeprimer/start/getGEE/)
 * Our code will be broken down into two main files - modules and function calls that bring it all together
 
 
 
-### Data pre-processing 
+### 2.. Calculate and combine variables
 
 * NAIP - add NDVI, add year, etc
 * Sentinel - cloudy
 * Elevation data - we used ArcMap to gather and clean LiDAR data, if this is not available you could use SRTM or DEM USGS data. But we wanted 1.5 m data
 * 
 
-### Modules
+#### Topographic variables
 
-### Topographic variables
+We calculated several topographic variables using our DEM and DSM:   
+        
+      
+      //var dsm = dsm.resample('bilinear').reproject(outCRS,null,outScale).mask(mask);
+      //print(dem.getInfo())
+      var maskedDEM = ct.maskDEM(dem, mask);
+      var maskedDSM = ct.maskDEM(dsm, mask);
 
-We calculated several topographic variables to include in our model:
-
-##### **Slope**
+##### Slope
 ```javascript
-//Module function
-exports.calculateSlopeDegrees = function(dem,mask){
-	return ee.Terrain.slope(dem).mask(mask)
-}
-
-//Script
 var slopeDegrees = ct.calculateSlopeDegrees(maskedDEM,mask);
 ```
-##### **Heat load index** (from Theobald et al, 2016)
-##### **Topographic Position Index**
-##### **Mean Topographic Position Index**
-##### **Canopy Height Model** (Digital Surface Model - Digital Elevation Model)
 
+##### Heat load index, based on Theobald et al (2015)
+```javascript
+var theobaldHLI = ct.calculateTheobaldHLI(maskedDEM,mask);
+```
 
+##### Mean Topographic Position Index
+```javascript
+var demMean_270m = ct.calculateNeighborhoodMean(maskedDEM,27)
+var demStdDev_270m = ct.calculateNeighborhoodStdDev(maskedDEM,27)
+var stdTPI_270m = ct.calculateStandardizedTPI(maskedDEM,demMean_270m,demStdDev_270m)
+
+var demMean_810m = ct.calculateNeighborhoodMean(maskedDEM,81)
+var demStdDev_810m = ct.calculateNeighborhoodStdDev(maskedDEM,81)
+var stdTPI_810m = ct.calculateStandardizedTPI(maskedDEM,demMean_810m,demStdDev_810m)
+
+var demMean_2430m = ct.calculateNeighborhoodMean(maskedDEM,243)
+var demStdDev_2430m = ct.calculateNeighborhoodStdDev(maskedDEM,243)
+var stdTPI_2430m = ct.calculateStandardizedTPI(maskedDEM,demMean_2430m,demStdDev_2430m)
+
+var meanTPI = ct.calculateMeanTPI(stdTPI_270m,stdTPI_810m,stdTPI_2430m)
+```
+
+##### Topographic Position Index, based on Theobald et al (2015)
+```javascript
+var tpi_270m = ct.calculateTPI(maskedDEM,demMean_270m)
+```
+
+##### Canopy Height Model (Digital Surface Model - Digital Elevation Model)
+```javascript
+var difference = ct.elevationDifference(maskedDEM,maskedDSM)
+	.reproject(outCRS,null,outScale)
+	.resample('bilinear')
+```
 
 #### Spectral variables
 
-### Within vs. Outside of GEE
+##### NDVI Difference
+##### Forest-cropland
+##### NDVI 45
+##### Burn ratio
 
-### Classification methods
+
+### 3. Set up and apply classification methods
+
 
 ### Supervised
 * Training
@@ -119,18 +173,14 @@ var slopeDegrees = ct.calculateSlopeDegrees(maskedDEM,mask);
 
 ### Unsupervised
 
-### Visualize results
-
-### Export results
+### 4. Evaluate and visualize results
 
 <!-- ##### Define variables
 
 The first step is to define 
 
 ```javascript
-var outScale = 1.5;
-var outCRS = 'EPSG:26911';
-var year = 2018;
+
 ``` -->
 
 <!-- ### Background
