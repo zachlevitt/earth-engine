@@ -81,7 +81,7 @@ var cloudPercentage = 0.2;
 var sentinel1 = ct.loadSentinel(extent,startDate1,endDate1,cloudPercentage);
 var sentinel2 = ct.loadSentinel(extent,startDate2,endDate2,cloudPercentage);
 ```
-[View loadSentinel function description](./modules.md#loadsentinel)
+* [View loadSentinel function description](./modules.md#loadsentinel)
 
 #### NAIP
 ```javascript
@@ -96,11 +96,11 @@ var naipYearsFourBands = ct.filterFourBands(naipYears);
 var withNDVI = ct.addNDVI(naipYearsFourBands);
 var naipMosaic = ct.mosaicNAIP(withNDVI,year,mask,outCRS,outScale)
 ```
-[View loadNAIP function description](./modules.md#loadnaip)
-[View addYears function description](./modules.md#addyears)
-[View filterFourBands function description](./modules.md#filterfourbands)
-[View addNDVI function description](./modules.md#addndvi)
-[View mosaicNAIP function description](./modules.md#mosaicnaip)
+* [View loadNAIP function description](./modules.md#loadnaip)
+* [View addYears function description](./modules.md#addyears)
+* [View filterFourBands function description](./modules.md#filterfourbands)
+* [View addNDVI function description](./modules.md#addndvi)
+* [View mosaicNAIP function description](./modules.md#mosaicnaip)
 
 ### **Elevation data** 
 
@@ -130,9 +130,9 @@ var dsm = ct.loadDSM()
 //Because this case study is for an island, we create a mask to mask out the water. This will make our measurements of certain indicators more accurate due to less noise from water data.
 var mask = ct.calculateMask(dem,10,300)
 ```
-[View loadDEM function description](./modules.md#loaddem)
-[View loadDSM function description](./modules.md#loaddsm)
-[View calculateMask function description](./modules.md#calculatemask)
+* [View loadDEM function description](./modules.md#loaddem)
+* [View loadDSM function description](./modules.md#loaddsm)
+* [View calculateMask function description](./modules.md#calculatemask)
 
 If you do not have LiDAR, you can use the USGS NED for study areas within the United States or SRTM data for global case studies. Add these to your script by searching for one of these datasets in the search bar and clicking the **Import** button. It should appear at the top of your script under an **Imports** header and you can change the name to whatever you like. In this script, we will name our elevation data **```dem```**. You will not be able to include the ```dsm``` in your analysis.
 
@@ -149,7 +149,7 @@ Either way, it will be necesary to mask your ```dem``` and ```dsm```.
 var maskedDEM = ct.maskDEM(dem, mask);
 var maskedDSM = ct.maskDEM(dsm, mask);
 ```
-[View maskDEM function description](./modules.md#maskdem)
+* [View **maskDEM** function description](./modules.md#maskdem)
 
 
 ## Calculate spectral and topographic variables
@@ -167,21 +167,21 @@ var difference = ct.elevationDifference(dem,dsm)
 	.reproject(outCRS,null,outScale)
 	.resample('bilinear')
 ```  
-[View elevationDifference function description](./modules.md#elevationdifference)
+* [View elevationDifference function description](./modules.md#elevationdifference)
 
 #### Slope
 The first topographic variable that requires only a DEM is slope, which helps distinguish between different landform types and will be an input to our heat load index.
 ```javascript
 var slopeDegrees = ct.calculateSlopeDegrees(dem);
 ```
-[View calculateSlopeDegrees function description](./modules.md#calculateslopedegrees)
+* [View calculateSlopeDegrees function description](./modules.md#calculateslopedegrees)
 
 #### Topographic Position Index
 Based on Theobald et al (2015), we calculate a multi-scale topographic position index (TPI) that measures relative topographic relief. This is measured by subtracting mean elevation for a neighborhood of cells from the base elevation data. In this case, we calculate TPI with kernel radius of 270m.
 ```javascript
 var tpi_270m = ct.calculateTPI(dem,demMean_270m)
 ```
-[View calculateTPI function description](./modules.md#calculatetpi)
+* [View calculateTPI function description](./modules.md#calculatetpi)
 
 #### Mean TPI
 Mean TPI is a helpful factor to be able to distinguish between landform types and requires only a DEM. This workflow is based on Theobald et al's (2015) method for calculating a mean TPI using three resolutions. We calculate the standardized TPI, which is the topographic position index divided by the standard deviation of elevation at the same spatial resolution. These standardized TPIs are then averaged to compute a Mean TPI layer.
@@ -200,10 +200,10 @@ var stdTPI_2430m = ct.calculateStandardizedTPI(maskedDEM,demMean_2430m,demStdDev
 
 var meanTPI = ct.calculateMeanTPI(stdTPI_270m,stdTPI_810m,stdTPI_2430m)
 ```
-[View calculateMeanTPI function description](./modules.md#calculatemeantpi)
-[View calculateStandardizedTPI function description](./modules.md#calculatestandardizedtpi)
-[View calculateNeighborhoodStdDev function description](./modules.md#calculateneighborhoodstddev)
-[View calculateNeighborhoodMean function description](./modules.md#calculateneighborhoodmean)
+* [View calculateMeanTPI function description](./modules.md#calculatemeantpi)
+* [View calculateStandardizedTPI function description](./modules.md#calculatestandardizedtpi)
+* [View calculateNeighborhoodStdDev function description](./modules.md#calculateneighborhoodstddev)
+* [View calculateNeighborhoodMean function description](./modules.md#calculateneighborhoodmean)
 
 
 #### Heat load index
@@ -211,7 +211,7 @@ We based our heat load index (HLI) on a workflow developed by SOMEONE (2002) and
 ```javascript
 var theobaldHLI = ct.calculateTheobaldHLI(dem);
 ```
-[View theobaldHLI function description](./modules.md#theobaldhli)
+* [View theobaldHLI function description](./modules.md#theobaldhli)
 
 ### Spectral variables
 
@@ -257,8 +257,8 @@ var painted = ct.paintImageWithFeatures(twoClasses)
 var stratifiedTraining = ct.stratify(painted,numPointsPerClass,outCRS,outScale,validationArea)
 var stratifiedValidation = ct.stratify(painted,numPointsPerClass,outCRS,outScale,sampleArea)
 ```
-[View paintImageWithFeatures function description](./modules.md#stratify)
-[View stratify function description](./modules.md#stratify)
+* [View paintImageWithFeatures function description](./modules.md#stratify)
+* [View stratify function description](./modules.md#stratify)
 
 ### Filter training and validation data
 Once you have created the training and validation data, it is possible to filter the training and validation data depending on its reliability. For example, since we are using a 2007 map of vegetation with a higher spatial resolution, we will filter out points that were labeled certain classes and have specific NDVI or elevation difference values.
@@ -287,8 +287,8 @@ var stratifiedValidation = ct.spatialJoin(difference,stratifiedValidation).map(f
 })
 var stratifiedValidation = ct.filterPointsTwo_Sentinel(stratifiedValidation_ndvi_diff,forestNDVIMin_Winter,forestDiffMin,notForestDiffMax,notForest_NDVIMax_Winter)
 ```
-[View spatialJoin function description](./modules.md#spatialjoin)
-[View filterPointsTwo_Sentinel function description](./modules.md#filterPointstwo_sentinel)
+* [View spatialJoin function description](./modules.md#spatialjoin)
+* [View filterPointsTwo_Sentinel function description](./modules.md#filterPointstwo_sentinel)
 
 
 ### Random Forest classification
