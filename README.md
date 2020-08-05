@@ -52,11 +52,11 @@ If you have never used GEE before, here is a helpful place to start: [https://je
 	* [Visualization parameters](#visualization-parameters)
 	* [Export data](#export-data)
 
-###Upload or import data
+### Upload or import data
 
 To perform image classification with topographic variables, there are two necessary inputs: [**satellite imagery**] and [**elevation data**]. These inputs will define the spatial resolution and projection of your entire analysis, so it is essential to think carefully about 
 
-####**Satellite imagery** 
+#### **Satellite imagery** 
 
 Depending upon your study area and end goals, there are several options for satellite imagery housed within GEE. 
 National Agricultural Imagery Program (NAIP) and Sentinel data both offer benefits and drawbacks for this type of analysis. NAIP imagery is much higher-resolution (1-meter compared to 10-meter for Sentinel) yet it is possible to calculate seasonal differences with Sentinel, while NAIP does not have enough imagery to allow for this type of analysis.
@@ -96,7 +96,7 @@ var withNDVI = ct.addNDVI(naipYearsFourBands);
 var naipMosaic = ct.mosaicNAIP(withNDVI,year,mask,outCRS,outScale)
 ```
 
-####**Elevation data** 
+#### **Elevation data** 
 
 There are several options for elevation data in GEE, including Shuttle Radar Topography Mission (SRTM) and USGS National Elevation Dataset (NED). These options offer national (USGS NED) or global (SRTM) elevation rasters, but unfortunately there is no surface model available for this data. 
 
