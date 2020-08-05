@@ -1,9 +1,8 @@
-## Modules for image classification in Google Earth Engine with topographic and spectral variables
+# Modules for image classification in Google Earth Engine with topographic and spectral variables
 [**Zach Levitt**](https://zachlevitt.github.io), '20.5</br>
 [**Jeff Howarth**](https://jeffhowarth.github.io/), Associate Professor of Geography</br>
 Middlebury College, Vermont, USA
 
-### Introduction
 These module functions are provided here as a reference for the [main tutorial](./README.md), which outlines a workflow for performing machine learning image classification with topographic and spectral variables. This overview is organized in the same way as the [module script](https://code.earthengine.google.com/44c19d132dd87e5d8e0fc904d1af8f09), reflecting the major tasks that are involved in performing this type of analysis. Each function and section is linked below.
 
 1. [**IMPORT ASSETS**](#import-assets)
@@ -45,11 +44,11 @@ These module functions are provided here as a reference for the [main tutorial](
 [**Return to main tutorial**](./README.md)
 
 
-### IMPORT ASSETS
+## IMPORT ASSETS
 <!-- ```javascript
 ``` -->
-### LOAD and FILTER IMAGERY
-##### loadNAIP
+## LOAD and FILTER IMAGERY
+### loadNAIP
 ```javascript
 //  Load NAIP from GEE library and filter to study area  
 exports.loadNAIP = function(extent) {
@@ -58,7 +57,7 @@ exports.loadNAIP = function(extent) {
 }
 ```
 
-##### loadSentinel
+### loadSentinel
 ```javascript
 //Load Sentinel from GEE library and filter to study area, time period, and cloudy percentage
 exports.loadSentinel = function(extent,startDate,endDate,cloudPercentage){
@@ -68,9 +67,9 @@ exports.loadSentinel = function(extent,startDate,endDate,cloudPercentage){
             .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE',cloudPercentage));
 }
 ```
-### PRE-PROCESS IMAGERY
+## PRE-PROCESS IMAGERY
 
-##### addYears
+### addYears
 ```javascript
 //Add year as an attribute to a collection of NAIP images
 exports.addYears = function(naipImages){
@@ -81,7 +80,7 @@ exports.addYears = function(naipImages){
   })
 }
 ```
-##### filterFourBands
+### filterFourBands
 ```javascript
 //Filter NAIP images based on whether there are at least four bands
 exports.filterFourBands = function(naipImagesWithYears){
@@ -89,7 +88,7 @@ exports.filterFourBands = function(naipImagesWithYears){
 }
 ```
 
-##### addPercentDiffSentinel
+### addPercentDiffSentinel
 ```javascript
 exports.addPercentDiffSentinel = function(image,bandName){
   var added = (image.select('1_'+bandName).subtract(image.select('0_'+bandName))).divide(image.select('1_'+bandName)).rename(bandName+'_diff');
@@ -97,7 +96,7 @@ exports.addPercentDiffSentinel = function(image,bandName){
 }
 ```
 
-##### addBandRatioSentinel
+### addBandRatioSentinel
 ```javascript
 exports.addBandRatioSentinel = function(image,bandName){
   var added = image.normalizedDifference(['0_'+bandName, '1_'+bandName]).rename(bandName+'_diff');
@@ -105,7 +104,7 @@ exports.addBandRatioSentinel = function(image,bandName){
 }
 ```
 
-##### addNDVI
+### addNDVI
 ```javascript
 // Add NDVI attribute to all NAIP images in a collection
 exports.addNDVI = function(images){
@@ -116,7 +115,7 @@ exports.addNDVI = function(images){
 }
 ```
 
-###### addNDVISentinel
+### addNDVISentinel
 ```javascript
 // Add NDVI attribute to all Sentinel images in a collection
 exports.addNDVISentinel = function(images){
@@ -126,7 +125,7 @@ exports.addNDVISentinel = function(images){
   });
 }
 ```
-###### addBurnSentinel
+### addBurnSentinel
 ```javascript
 // Add burn ratio attribute to all Sentinel images in a collection
 exports.addBurnSentinel = function(images){
@@ -136,7 +135,7 @@ exports.addBurnSentinel = function(images){
   });
 }
 ```
-##### addForestCroplandSentinel
+### addForestCroplandSentinel
 ```javascript
 //Add band ratio for Sentinel imagery from:
 //tm7-tm2 from http://web.pdx.edu/~nauna/resources/10_BandCombinations.htm
@@ -148,7 +147,7 @@ exports.addForestCroplandSentinel = function(images){
 }
 ```
 
-##### addNDVI45
+### addNDVI45
 ```javascript
 //Add NDVI 45 attribute to all Sentinel images in a collection
 exports.addNDVI45 = function(images){
@@ -159,7 +158,7 @@ exports.addNDVI45 = function(images){
 }
 ```
 
-##### mosaicNAIP
+### mosaicNAIP
 ```javascript
 //Mosaic NAIP images from a collection and reproject
 exports.mosaicNAIP = function(images,year,mask,outCRS,outScale){
@@ -172,7 +171,7 @@ exports.mosaicNAIP = function(images,year,mask,outCRS,outScale){
     .mask(mask)
 }
 ```
-##### mosaicSentinel
+### mosaicSentinel
 ```javascript
 //Mosaic Sentinel images from a collection using a quality attribute and reproject
 exports.mosaicSentinel = function(images,mask,outCRS,outScale){
@@ -184,11 +183,11 @@ exports.mosaicSentinel = function(images,mask,outCRS,outScale){
     .mask(mask)
 }
 ```
-### DATA PROCESSING
+## DATA PROCESSING
 <!-- ```javascript
 ``` -->
-### TOPOGRAPHIC VARIABLES
-##### elevationDifference
+## TOPOGRAPHIC VARIABLES
+### elevationDifference
 ```javascript
 //Compute Canopy Height Model
 exports.elevationDifference = function(dem,dsm){
@@ -196,7 +195,7 @@ exports.elevationDifference = function(dem,dsm){
 }
 ```
 
-##### calculateSlopeDegrees
+### calculateSlopeDegrees
 ```javascript
 //Calculate slope in degrees from elevation data
 exports.calculateSlopeDegrees = function(dem,mask){
@@ -204,7 +203,7 @@ exports.calculateSlopeDegrees = function(dem,mask){
 }
 ```
 
-##### calculateTheobaldHLI
+### calculateTheobaldHLI
 ```javascript
 //Calculate heat load index, based on Theobald et al (2015)
 exports.calculateTheobaldHLI = function(dem,mask) {
@@ -216,7 +215,7 @@ exports.calculateTheobaldHLI = function(dem,mask) {
 };
 ```
 
-##### calculateNeighborhoodMean
+### calculateNeighborhoodMean
 ```javascript
 //  Calculate a neighborhood mean using a pre-defined kernel radius
 exports.calculateNeighborhoodMean = function(image, kernelRadius) {
@@ -228,7 +227,7 @@ exports.calculateNeighborhoodMean = function(image, kernelRadius) {
 }
 ```
 
-##### calculateNeighborhoodStdDev
+### calculateNeighborhoodStdDev
 ```javascript
 //Calculate a neighborhood standard deviation using a pre-defined kernel radius    
 exports.calculateNeighborhoodStdDev = function(image, kernelRadius) {
@@ -240,7 +239,7 @@ exports.calculateNeighborhoodStdDev = function(image, kernelRadius) {
 }
 ```
 
-##### calculateTPI
+### calculateTPI
 ```javascript
 //Calculate topographic position index from a pre-defined mean image
 exports.calculateTPI = function(image, meanImage) {
@@ -248,7 +247,7 @@ exports.calculateTPI = function(image, meanImage) {
 }
 ```
 
-##### calculateMeanTPI
+### calculateMeanTPI
 ```javascript
 //Calculate mean topographic position index, based on Theobald et al (2015)
 exports.calculateMeanTPI = function(image1,image2,image3){
@@ -256,9 +255,9 @@ exports.calculateMeanTPI = function(image1,image2,image3){
 }
 ```
 
-### MULTIBAND IMAGE ANALYSIS METHODS
+## MULTIBAND IMAGE ANALYSIS METHODS
 
-##### toBandedImage
+### toBandedImage
 ```javascript
 //Add aligned rasters to a single image as bands
 exports.toBandedImage = function(imageCollection){
@@ -266,7 +265,7 @@ exports.toBandedImage = function(imageCollection){
 }
 ```
 
-##### generateSampleData
+### generateSampleData
 ```javascript
 //Add aligned rasters to a single image as bands
 exports.generateSampleData = function(image,bands,collection,property){
@@ -277,7 +276,7 @@ exports.generateSampleData = function(image,bands,collection,property){
 }
 ```
 
-##### paintImageWithFeatures
+### paintImageWithFeatures
 ```javascript
 exports.paintImageWithFeatures = function(features){
   return ee.Image().byte().paint({
@@ -287,7 +286,7 @@ exports.paintImageWithFeatures = function(features){
 }
 ```
 
-##### stratify
+### stratify
 ```javascript
 exports.stratify = function(image,numPointsPerClass,outCRS,outScale,geometry){
   return image.addBands(ee.Image.pixelLonLat())
@@ -303,7 +302,7 @@ exports.stratify = function(image,numPointsPerClass,outCRS,outScale,geometry){
 }
 ```
 
-##### spatialJoin
+### spatialJoin
 ```javascript
 //Spatial join of raster data to vector points
 exports.spatialJoin = function(image,points){
@@ -311,7 +310,7 @@ exports.spatialJoin = function(image,points){
 }
 ```
 
-##### filterPointsFour
+### filterPointsFour
 ```javascript
 exports.filterPointsFour = function(features,forestNDVI,forestDiff,bareNDVI,bareDiff,herbDiff,herbNDVI){
   var filter1 = features.filter(ee.Filter.and(ee.Filter.eq('class', 4),ee.Filter.gt('ndvi_value', bareNDVI),ee.Filter.gt('norm_diff',bareDiff)).not());
@@ -322,7 +321,7 @@ exports.filterPointsFour = function(features,forestNDVI,forestDiff,bareNDVI,bare
 }
 ```
 
-##### filterPointsThree
+### filterPointsThree
 ```javascript  
 exports.filterPointsThree = function(features,forestNDVI,forestDiff,bareNDVI,bareDiff,herbDiff,herbNDVI){
   var filter1 = features.filter(ee.Filter.and(ee.Filter.eq('class', 2),ee.Filter.gt('ndvi_value', bareNDVI),ee.Filter.gt('norm_diff',bareDiff)).not());
@@ -332,7 +331,7 @@ exports.filterPointsThree = function(features,forestNDVI,forestDiff,bareNDVI,bar
 }
 ```
 
-##### filterPointsThree
+### filterPointsThree
 ```javascript   
 exports.filterPointsThree = function(features,forestNDVI,forestDiff,bareNDVI,bareDiff,herbDiff,herbNDVI){
   var filter1 = features.filter(ee.Filter.and(ee.Filter.eq('class', 2),ee.Filter.gt('ndvi_value', bareNDVI),ee.Filter.gt('norm_diff',bareDiff)).not());
@@ -342,6 +341,4 @@ exports.filterPointsThree = function(features,forestNDVI,forestDiff,bareNDVI,bar
 }
 ```
 
-### VISUALIZATION
-<!-- ```javascript
-``` -->
+## VISUALIZATION
