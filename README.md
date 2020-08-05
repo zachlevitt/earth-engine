@@ -1,11 +1,11 @@
 ![](header.png "Image classification in Earth Engine")
 
-## Image classification in Google Earth Engine with topographic and spectral variables
+# Image classification in Google Earth Engine with topographic and spectral variables
 [**Zach Levitt**](https://zachlevitt.github.io), '20.5</br>
 [**Jeff Howarth**](https://jeffhowarth.github.io/), Associate Professor of Geography</br>
 Middlebury College, Vermont, USA
 
-### Introduction
+## Introduction
 
 This tutorial outlines a workflow for classifying remotely-sensed imagery in Google Earth Engine (GEE) using machine learning models trained on topographic and spectral variables. Using a combination of pre-loaded GEE satellite imagery and analysis methods, as well as topographic variables, we describe the steps to implement an image classification methodology in GEE. We utilize supervised classification methods and demonstrate various methods for improving the accuracy and efficiency of the workflow. While we apply these methods to classify vegetation on the Channel Islands of California, our module functions and the general workflow are applicable to a wide range of use cases. 
 
@@ -23,7 +23,7 @@ The code snippets below are from the [**completed script**](https://code.earthen
 <!-- 
 If you have never used GEE before, here is a helpful place to start: [https://jeffhowarth.github.io/eeprimer/start/getGEE/](https://jeffhowarth.github.io/eeprimer/start/getGEE/) -->
 
-### What are the aspects of this tutorial?
+## What are the aspects of this tutorial?
 
 1. [**Data inputs and pre-processing**](#upload-or-import-data)
 	1. [Satellite imagery](#satellite-imagery) (NAIP, Sentinel, etc.)
@@ -52,17 +52,17 @@ If you have never used GEE before, here is a helpful place to start: [https://je
 	* [Visualization parameters](#visualization-parameters)
 	* [Export data](#export-data)
 
-### Upload or import data
+## Upload or import data
 
 To perform image classification with topographic variables, there are two necessary inputs: [**satellite imagery**] and [**elevation data**]. These inputs will define the spatial resolution and projection of your entire analysis, so it is essential to think carefully about 
 
-#### **Satellite imagery** 
+### **Satellite imagery** 
 
 Depending upon your study area and end goals, there are several options for satellite imagery housed within GEE. 
 National Agricultural Imagery Program (NAIP) and Sentinel data both offer benefits and drawbacks for this type of analysis. NAIP imagery is much higher-resolution (1-meter compared to 10-meter for Sentinel) yet it is possible to calculate seasonal differences with Sentinel, while NAIP does not have enough imagery to allow for this type of analysis.
 
 
-##### Sentinel
+#### Sentinel
 ```javascript
 //Sentinel imagery has a spatial resolution of 10 meters
 var outScale = 10;
@@ -83,7 +83,7 @@ var sentinel2 = ct.loadSentinel(extent,startDate2,endDate2,cloudPercentage);
 ```
 [View loadSentinel function description](./modules.md#loadsentinel)
 
-##### NAIP
+#### NAIP
 ```javascript
 var outScale = 1.5;
 var outCRS = 'EPSG:26911'
@@ -102,7 +102,7 @@ var naipMosaic = ct.mosaicNAIP(withNDVI,year,mask,outCRS,outScale)
 [View addNDVI function description](./modules.md#addndvi)
 [View mosaicNAIP function description](./modules.md#mosaicnaip)
 
-#### **Elevation data** 
+### **Elevation data** 
 
 There are several options for elevation data in GEE, including Shuttle Radar Topography Mission (SRTM) and USGS National Elevation Dataset (NED). These options offer national (USGS NED) or global (SRTM) elevation rasters, but unfortunately there is no surface model available for this data. 
 
@@ -152,15 +152,15 @@ var maskedDSM = ct.maskDEM(dsm, mask);
 [View maskDEM function description](./modules.md#maskdem)
 
 
-### Calculate spectral and topographic variables
+## Calculate spectral and topographic variables
 
 Once you have successfully loaded your imagery and elevation data, you can begin to calculate spectral and topographic variables that will be used in the classification process. 
 
-#### Topographic variables
+### Topographic variables
 
 Most of our topographic variables utilize only a digital elevation model, yet the canopy height method requires a digital surface model in addition.
 
-##### Canopy Height
+#### Canopy Height
 Canopy height is calculated by subtracting a digital elevation model from a digital surface model. This calculation is **not possible** if you are using SRTM or USGS NED data, which does not offer a surface model. 
 ```javascript
 var difference = ct.elevationDifference(dem,dsm)
@@ -169,21 +169,21 @@ var difference = ct.elevationDifference(dem,dsm)
 ```  
 [View elevationDifference function description](./modules.md#elevationdifference)
 
-##### Slope
+#### Slope
 The first topographic variable that requires only a DEM is slope, which helps distinguish between different landform types and will be an input to our heat load index.
 ```javascript
 var slopeDegrees = ct.calculateSlopeDegrees(dem);
 ```
 [View calculateSlopeDegrees function description](./modules.md#calculateslopedegrees)
 
-##### Topographic Position Index
+#### Topographic Position Index
 Based on Theobald et al (2015), we calculate a multi-scale topographic position index (TPI) that measures relative topographic relief. This is measured by subtracting mean elevation for a neighborhood of cells from the base elevation data. In this case, we calculate TPI with kernel radius of 270m.
 ```javascript
 var tpi_270m = ct.calculateTPI(dem,demMean_270m)
 ```
 [View calculateTPI function description](./modules.md#calculatetpi)
 
-##### Mean TPI
+#### Mean TPI
 Mean TPI is a helpful factor to be able to distinguish between landform types and requires only a DEM. This workflow is based on Theobald et al's (2015) method for calculating a mean TPI using three resolutions. We calculate the standardized TPI, which is the topographic position index divided by the standard deviation of elevation at the same spatial resolution. These standardized TPIs are then averaged to compute a Mean TPI layer.
 ```javascript
 var demMean_270m = ct.calculateNeighborhoodMean(dem,27)
@@ -206,36 +206,36 @@ var meanTPI = ct.calculateMeanTPI(stdTPI_270m,stdTPI_810m,stdTPI_2430m)
 [View calculateNeighborhoodMean function description](./modules.md#calculateneighborhoodmean)
 
 
-##### Heat load index
+#### Heat load index
 We based our heat load index (HLI) on a workflow developed by SOMEONE (2002) and modified by Theobald et al (2015). This continuous heat-insolation index attempts to measure the amount of heat exposure on a given piece of land based on topography. 
 ```javascript
 var theobaldHLI = ct.calculateTheobaldHLI(dem);
 ```
 [View theobaldHLI function description](./modules.md#theobaldhli)
 
-#### Spectral variables
+### Spectral variables
 
 
 
-##### NDVI Difference
-##### Forest-cropland
-##### NDVI 45
-##### Burn ratio
+#### NDVI Difference
+#### Forest-cropland
+#### NDVI 45
+#### Burn ratio
 * NAIP - add NDVI, add year, etc
 * Sentinel - cloudy
 
 
-### Set up and apply classification methods
+## Set up and apply classification methods
 
-#### Create image stack with bands and variables
+### Create image stack with bands and variables
 
 
-#### Create training and validation geometries
+### Create training and validation geometries
 The creation of reliable training and validation geometries requires some form of trusted samples. This could include ground-truthed data collected in the field, prior data gathered by other research groups, or hand-selected points/polygons within Earth Engine. 
 
 In general, this step requires reliable geometries (points or polygons) that are associated with the classes that you would like to predict with the Random Forest classification. The first method (reference data) is dependent upon existing data but allows for a much quicker workflow. On the other hand, hand-selecting points or polygons in Earth Engine or QGIS will be much more time intensive yet will potentially be more accurate.
 
-##### Reference data method
+#### Reference data method
 
 For our case study we utilize a vegetation dataset from [2007](https://map.dfg.ca.gov/metadata/ds0563.html) for Santa Cruz Island, the largest of the Channel Islands. This shapefile was downloaded, imported into QGIS, and dissolved on the Veg_Class field to reduce the number of fields for classification. In the end, we outputted three different versions of the data to allow for a comparative analysis:
 
@@ -260,7 +260,7 @@ var stratifiedValidation = ct.stratify(painted,numPointsPerClass,outCRS,outScale
 [View paintImageWithFeatures function description](./modules.md#stratify)
 [View stratify function description](./modules.md#stratify)
 
-#### Filter training and validation data
+### Filter training and validation data
 Once you have created the training and validation data, it is possible to filter the training and validation data depending on its reliability. For example, since we are using a 2007 map of vegetation with a higher spatial resolution, we will filter out points that were labeled certain classes and have specific NDVI or elevation difference values.
 
 First, it is necessary to perform a spatial join of the desired bands to the geometries.
@@ -291,7 +291,7 @@ var stratifiedValidation = ct.filterPointsTwo_Sentinel(stratifiedValidation_ndvi
 [View filterPointsTwo_Sentinel function description](./modules.md#filterPointstwo_sentinel)
 
 
-#### Random Forest classification
+### Random Forest classification
 ```javascript
 // Create training and validation datasets by sampling pixels from the training collection.
 var training_data = ct.generateSampleData(multiband_diff,bands,stratifiedTraining,'class');
@@ -303,8 +303,8 @@ var RF_trained = ee.Classifier.smileRandomForest(numTrees).train(training_data,'
 // Classify validation data with trained classifier.
 var RF_validation = validation_data.classify(RF_trained);
 ```
-### Evaluate and visualize results
-#### Compute confusion matrix
+## Evaluate and visualize results
+### Compute confusion matrix
 ```javascript
 //Produce an error matrix and output accuracy values for Random Forest
 var RF_matrix = RF_validation.errorMatrix('class', 'classification');
@@ -312,10 +312,10 @@ var RF_dict = ct.createRFDict(RF_matrix,numClasses)
 print("Random Forest accuracy information",RF_dict)
 ```
 
-#### Variable importance
+### Variable importance
 ```javascript
 var explained = RF_trained.explain()
 print('Explanation of trained RF model',explained)
 ```
-#### Visualization parameters
-#### Export data?
+### Visualization parameters
+### Export data?
