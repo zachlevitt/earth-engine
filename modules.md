@@ -1,4 +1,4 @@
-# Modules for image classification in Google Earth Engine with topographic and spectral variables
+# IN PROGRESS: Modules for image classification in Google Earth Engine with topographic and spectral variables
 [**Zach Levitt**](https://zachlevitt.github.io), '20.5</br>
 [**Jeff Howarth**](https://jeffhowarth.github.io/), Associate Professor of Geography</br>
 Middlebury College, Vermont, USA
