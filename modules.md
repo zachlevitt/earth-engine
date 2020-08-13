@@ -59,8 +59,8 @@ exports.loadImageAsset = function(path){
 ```
 
 ### loadNAIP
-Input: extent (ee.Feature or ee.FeatureCollection), studyYear (Number)</br>
-Output: ee.ImageCollection
+Input: *extent* (ee.Feature or ee.FeatureCollection), studyYear (Number)</br>
+Output: *ee.ImageCollection*
 ```javascript
 //Loads NAIP imagery for a given extent and study year.
 //Adds an NDVI band and filters for imagery with >3 bands
