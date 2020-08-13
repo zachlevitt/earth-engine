@@ -50,7 +50,7 @@ These module functions are provided here as a reference for the [main tutorial](
 ``` -->
 ## LOAD and FILTER IMAGERY
 ### loadImageAsset
-Input: path (string)
+Input: path (string)</br>
 Output: ee.Image
 ```javascript
 exports.loadImageAsset = function(path){
@@ -59,7 +59,7 @@ exports.loadImageAsset = function(path){
 ```
 
 ### loadNAIP
-Input: extent (ee.Feature or ee.FeatureCollection), studyYear (Number)
+Input: extent (ee.Feature or ee.FeatureCollection), studyYear (Number)</br>
 Output: ee.ImageCollection
 ```javascript
 //Loads NAIP imagery for a given extent and study year.
@@ -81,6 +81,8 @@ exports.loadNAIP = function(extent,studyYear){
 ```
 
 ### loadSentinel
+Input:</br>
+Output: 
 ```javascript
 //Loads Sentinel 2-A imagery for a given extent, start and end date, and max cloud percentage.
 //Filters imagery for cloudy pixels
@@ -106,26 +108,9 @@ exports.loadSentinel = function(extent,startDate,endDate,cloudPercentage){
 ```
 ## PRE-PROCESS IMAGERY
 
-<!-- ### addYears
-```javascript
-//Add year as an attribute to a collection of NAIP images
-exports.addYears = function(naipImages){
-  return naipImages.map(function(image){
-    var imageYear = image.date().get('year')
-    var bandNames = image.bandNames().length()
-    return image.set({year:imageYear, bands:bandNames})
-  })
-}
-```
-### filterFourBands
-```javascript
-//Filter NAIP images based on whether there are at least four bands
-exports.filterFourBands = function(naipImagesWithYears){
-  return naipImagesWithYears.filter(ee.Filter.gt('bands', 3));
-}
-``` -->
-
 ### addPercentDiffSentinel
+Input:</br>
+Output: 
 ```javascript
 exports.addPercentDiffSentinel = function(image,bandName){
   var added = (image.select('1_'+bandName).subtract(image.select('0_'+bandName))).divide(image.select('1_'+bandName)).rename(bandName+'_diff');
@@ -134,6 +119,8 @@ exports.addPercentDiffSentinel = function(image,bandName){
 ```
 
 ### addBandRatioSentinel
+Input:</br>
+Output: 
 ```javascript
 exports.addBandRatioSentinel = function(image,bandName){
   var added = image.normalizedDifference(['0_'+bandName, '1_'+bandName]).rename(bandName+'_diff');
@@ -142,6 +129,8 @@ exports.addBandRatioSentinel = function(image,bandName){
 ```
 
 ### addNDVI
+Input:</br>
+Output: 
 ```javascript
 // Add NDVI attribute to all NAIP images in a collection
 exports.addNDVI = function(images){
@@ -152,50 +141,9 @@ exports.addNDVI = function(images){
 }
 ```
 
-<!-- ### addNDVISentinel
-```javascript
-// Add NDVI attribute to all Sentinel images in a collection
-exports.addNDVISentinel = function(images){
-  return images.map(function(image){
-    var ndvi = image.normalizedDifference(['B8', 'B4']).rename('NDVI');
-  return image.addBands(ndvi);
-  });
-}
-``` -->
-<!-- ### addBurnSentinel
-```javascript
-// Add burn ratio attribute to all Sentinel images in a collection
-exports.addBurnSentinel = function(images){
-  return images.map(function(image){
-    var burn = image.normalizedDifference(['B8', 'B12']).rename('burn');
-  return image.addBands(burn);
-  });
-}
-``` -->
-<!-- ### addForestCroplandSentinel
-```javascript
-//Add band ratio for Sentinel imagery from:
-//tm7-tm2 from http://web.pdx.edu/~nauna/resources/10_BandCombinations.htm
-exports.addForestCroplandSentinel = function(images){
-  return images.map(function(image){
-    var forestCropland = image.normalizedDifference(['B12', 'B3']).rename('forest');
-  return image.addBands(forestCropland);
-  });
-}
-``` -->
-
-<!-- ### addNDVI45
-```javascript
-//Add NDVI 45 attribute to all Sentinel images in a collection
-exports.addNDVI45 = function(images){
-  return images.map(function(image){
-    var ndvi45 = image.normalizedDifference(['B5', 'B4']).rename('NDVI45');
-  return image.addBands(ndvi45);
-  });
-}
-``` -->
-
 ### mosaicNAIP
+Input:</br>
+Output: 
 ```javascript
 //Mosaic NAIP images from a collection and reproject
 exports.mosaicNAIP = function(images,year,mask,outCRS,outScale){
@@ -209,6 +157,8 @@ exports.mosaicNAIP = function(images,year,mask,outCRS,outScale){
 }
 ```
 ### mosaicSentinel
+Input:</br>
+Output: 
 ```javascript
 //Mosaic Sentinel images from a collection using a quality attribute and reproject
 exports.mosaicSentinel = function(images,mask,outCRS,outScale){
@@ -222,6 +172,8 @@ exports.mosaicSentinel = function(images,mask,outCRS,outScale){
 ```
 ## DEM PROCESSING
 ### calculateMask
+Input:</br>
+Output: 
 ```javascript
 //Calculates a mask for a digital elevation model of an islannd
 //based on a provided minimum elevation and buffer distance.
@@ -235,6 +187,8 @@ exports.calculateMask = function(dem,minElevation,bufferDistance){
 ```
 
 ### processElevationData
+Input:</br>
+Output: 
 ```javascript
 //Masks image and reprojects/resamples if crs and scale are provided
 exports.processElevationData = function(image,mask,crs,scale) {
@@ -257,6 +211,8 @@ exports.processElevationData = function(image,mask,crs,scale) {
 };
 ```
 ### resampleDEM 
+Input:</br>
+Output: 
 ```javascript
 //Reproject DEM to desired CRS and scale, resample with bilinear method
 exports.resampleDEM = function(dem,outCRS,outScale){
@@ -266,6 +222,8 @@ exports.resampleDEM = function(dem,outCRS,outScale){
 
 ## TOPOGRAPHIC VARIABLES
 ### elevationDifference
+Input:</br>
+Output: 
 ```javascript
 //Compute Canopy Height Model
 exports.elevationDifference = function(dem,dsm){
@@ -274,6 +232,8 @@ exports.elevationDifference = function(dem,dsm){
 ```
 
 ### calculateSlopeDegrees
+Input:</br>
+Output: 
 ```javascript
 //Calculate slope in degrees from elevation data
 exports.calculateSlopeDegrees = function(dem,mask){
@@ -282,6 +242,8 @@ exports.calculateSlopeDegrees = function(dem,mask){
 ```
 
 ### calculateTheobaldHLI
+Input:</br>
+Output: 
 ```javascript
 //Calculate heat load index, based on Theobald et al (2015)
 exports.calculateTheobaldHLI = function(dem,mask) {
@@ -294,6 +256,8 @@ exports.calculateTheobaldHLI = function(dem,mask) {
 ```
 
 ### calculateNeighborhoodMean
+Input:</br>
+Output: 
 ```javascript
 //  Calculate a neighborhood mean using a pre-defined kernel radius
 exports.calculateNeighborhoodMean = function(image, kernelRadius) {
@@ -306,6 +270,8 @@ exports.calculateNeighborhoodMean = function(image, kernelRadius) {
 ```
 
 ### calculateNeighborhoodStdDev
+Input:</br>
+Output: 
 ```javascript
 //Calculate a neighborhood standard deviation using a pre-defined kernel radius    
 exports.calculateNeighborhoodStdDev = function(image, kernelRadius) {
@@ -318,6 +284,8 @@ exports.calculateNeighborhoodStdDev = function(image, kernelRadius) {
 ```
 
 ### calculateTPI
+Input:</br>
+Output: 
 ```javascript
 //Calculate topographic position index from a pre-defined mean image
 exports.calculateTPI = function(image, meanImage) {
@@ -326,6 +294,8 @@ exports.calculateTPI = function(image, meanImage) {
 ```
 
 ### calculateMeanTPI
+Input:</br>
+Output: 
 ```javascript
 //Calculate mean topographic position index, based on Theobald et al (2015)
 exports.calculateMeanTPI = function(image1,image2,image3){
@@ -334,6 +304,8 @@ exports.calculateMeanTPI = function(image1,image2,image3){
 ```
 
 ### calculateLandforms
+Input:</br>
+Output: 
 ```javascript
 exports.calculateLandforms = function(dem,slopeDegrees,theobaldHLI,meanTPI,tpi_270m){
   var slopeReclass = ee.Image(1)
@@ -440,6 +412,8 @@ return reclassCombined
 ```
 
 ### remapLandforms
+Input:</br>
+Output: 
 ```javascript
 //Reclassify landforms layer to fit with visualization parameters.
 exports.remapLandforms = function(landforms){
@@ -450,6 +424,8 @@ exports.remapLandforms = function(landforms){
 ## MULTIBAND IMAGE ANALYSIS METHODS
 
 ### toBandedImage
+Input:</br>
+Output: 
 ```javascript
 //Add aligned rasters to a single image as bands
 exports.toBandedImage = function(imageCollection){
@@ -458,6 +434,8 @@ exports.toBandedImage = function(imageCollection){
 ```
 
 ### generateSampleData
+Input:</br>
+Output: 
 ```javascript
 //Add aligned rasters to a single image as bands
 exports.generateSampleData = function(image,bands,collection,property){
@@ -469,6 +447,8 @@ exports.generateSampleData = function(image,bands,collection,property){
 ```
 
 ### paintImageWithFeatures
+Input:</br>
+Output: 
 ```javascript
 exports.paintImageWithFeatures = function(features){
   return ee.Image().byte().paint({
@@ -479,6 +459,8 @@ exports.paintImageWithFeatures = function(features){
 ```
 
 ### createStratifiedPoints
+Input:</br>
+Output: 
 ```javascript
 exports.createStratifiedPoints = function(image,numPointsPerClass,outCRS,outScale,geometry){
   return image.addBands(ee.Image.pixelLonLat())
@@ -495,6 +477,8 @@ exports.createStratifiedPoints = function(image,numPointsPerClass,outCRS,outScal
 ```
 
 ### spatialJoin
+Input:</br>
+Output: 
 ```javascript
 //Spatial join of raster data to vector points
 exports.spatialJoin = function(image,points){
@@ -502,28 +486,9 @@ exports.spatialJoin = function(image,points){
 }
 ```
 
-<!-- ### filterPointsFour
-```javascript
-exports.filterPointsFour = function(features,forestNDVI,forestDiff,bareNDVI,bareDiff,herbDiff,herbNDVI){
-  var filter1 = features.filter(ee.Filter.and(ee.Filter.eq('class', 4),ee.Filter.gt('ndvi_value', bareNDVI),ee.Filter.gt('norm_diff',bareDiff)).not());
-  var filter2 = filter1.filter(ee.Filter.and(ee.Filter.eq('class', 2),ee.Filter.gt('ndvi_value', herbNDVI)).not());
-  var filter3 = filter2.filter(ee.Filter.and(ee.Filter.eq('class', 1),ee.Filter.lt('ndvi_value', forestNDVI),ee.Filter.lt('norm_diff',forestDiff)).not());
-  var filter4 = filter3.filter(ee.Filter.and(ee.Filter.eq('class', 3),ee.Filter.gt('norm_diff',herbDiff),ee.Filter.lt('ndvi_value', herbNDVI)).not())
-  return filter4;
-}
-``` -->
-<!-- 
-### filterPointsThree
-```javascript  
-exports.filterPointsThree = function(features,forestNDVI,forestDiff,bareNDVI,bareDiff,herbDiff,herbNDVI){
-  var filter1 = features.filter(ee.Filter.and(ee.Filter.eq('class', 2),ee.Filter.gt('ndvi_value', bareNDVI),ee.Filter.gt('norm_diff',bareDiff)).not());
-  var filter2 = filter1.filter(ee.Filter.and(ee.Filter.eq('class', 0),ee.Filter.lt('ndvi_value', forestNDVI),ee.Filter.lt('norm_diff',forestDiff)).not());
-  var filter3 = filter2.filter(ee.Filter.and(ee.Filter.eq('class', 1),ee.Filter.lt('norm_diff',herbDiff),ee.Filter.lt('ndvi_value', herbNDVI)).not())
-  return filter3;
-}
-``` -->
-
 ### filterPoints
+Input:</br>
+Output: 
 ```javascript   
 exports.filterPoints = function(features,filter,field){
   filter.map(function(classFilter){
@@ -535,6 +500,8 @@ exports.filterPoints = function(features,filter,field){
 ```
 
 ### createRFDict
+Input:</br>
+Output: 
 ```javascript
 exports.createRFDict = function(RF_matrix){
   var RF_producers = RF_matrix.producersAccuracy()
