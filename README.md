@@ -1,10 +1,13 @@
 ![](header.png "Calculating topographic variables in Earth Engine")
 
 # Calculating topographic variables from Theobald et al. (2015) in Google Earth Engine
+[**Zach Levitt**](https://zachlevitt.github.io), '20.5</br>
+[**Jeff Howarth**](https://jeffhowarth.github.io/), Associate Professor of Geography</br>
+Middlebury College, Vermont, USA
 
 ## Introduction
 
-This tutorial outlines a workflow for utilizing module functions in Google Earth Engine (GEE) to calculate a set of topographic variables derived from Theobald et al. (2015). We use modules to define functions that can be applied to any case study. GEE [Modules](https://medium.com/google-earth/making-it-easier-to-reuse-code-with-earth-engine-script-modules-2e93f49abb13) are helpful for producing reusable code and allow anyone to reference pre-defined functions with their own inputs. You can reference these functions in your script or modify them to fit your context and create your own module script. This [tutorial](./modules.md) offers descriptions of the module functions. To connect to the module functions defined [here](https://code.earthengine.google.com/9ef0eb7a802163ba97e51a94a754379d), add this line at the top of your script:
+This tutorial outlines a workflow for utilizing module functions in Google Earth Engine (GEE) to calculate a set of topographic variables derived from Theobald et al. (2015). We use modules to define functions that can be applied to any case study. GEE [Modules](https://medium.com/google-earth/making-it-easier-to-reuse-code-with-earth-engine-script-modules-2e93f49abb13) are helpful for producing reusable code and allow anyone to reference pre-defined functions with their own inputs. You can reference these functions in your script or modify them to fit your context and create your own module script. This [tutorial](./topoModules.md) offers descriptions of the module functions. To connect to the module functions defined [here](https://code.earthengine.google.com/9ef0eb7a802163ba97e51a94a754379d), add this line at the top of your script:
 
 ```javascript
 var tt = require('users/zlevitt/chis:topoTools.js');
@@ -44,8 +47,7 @@ var dem = tt.loadImageAsset('users/zlevitt/chis_assets/sci_dem_1p5m');
 var CRS = dem.projection().crs();
 var elevationScale = dem.projection().nominalScale();
 ```
-[View **loadImageAsset** function description](./modules.md#loadImageAsset) </br>
-[View **calculateMask** function description](./modules.md#calculatemask)
+[View **loadImageAsset** function description](./topoModules.md#loadImageAsset) </br>
 
 
 ## Clip DEM to study region
@@ -84,7 +86,7 @@ The first topographic variable is slope, which helps distinguish between differe
 ```javascript
 var slopeDegrees = tt.calculateSlopeDegrees(demClipped);
 ```
-[View **calculateSlopeDegrees** function description](./modules.md#calculateslopedegrees)
+[View **calculateSlopeDegrees** function description](./topoModules.md#calculateslopedegrees)
 
 #### Topographic Position Index
 Based on Theobald et al (2015), we calculate a multi-scale topographic position index (TPI) that measures relative topographic relief. This is measured by subtracting mean elevation for a neighborhood of cells from the base elevation data. In this case, we calculate TPI with kernel radius of 270m.
@@ -92,7 +94,7 @@ Based on Theobald et al (2015), we calculate a multi-scale topographic position 
 var demMean_270m = tt.calculateNeighborhoodMean(demClipped,180);
 var tpi_270m = tt.calculateTPI(demClipped,demMean_270m);
 ```
-[View **calculateTPI** function description](./modules.md#calculatetpi)
+[View **calculateTPI** function description](./topoModules.md#calculatetpi)
 
 #### Mean TPI
 Mean TPI is a helpful factor to be able to distinguish between landform types and requires only a DEM. This workflow is based on Theobald et al's (2015) method for calculating a mean TPI using three resolutions. We calculate the standardized TPI, which is the topographic position index divided by the standard deviation of elevation at the same spatial resolution. These standardized TPIs are then averaged to compute a Mean TPI layer.
@@ -113,11 +115,11 @@ var stdTPI_2430m = tt.calculateStandardizedTPI(demClipped,demMean_2430m,demStdDe
         
 var meanTPI = tt.calculateMeanTPI(stdTPI_270m,stdTPI_810m,stdTPI_2430m);
 ```
-[View **calculateMeanTPI** function description](./modules.md#calculatemeantpi)</br>
-[View **calculateStandardizedTPI** function description](./modules.md#calculatestandardizedtpi)</br>
-[View **calculateNeighborhoodStdDev** function description](./modules.md#calculateneighborhoodstddev)</br>
-[View **calculateNeighborhoodMean** function description](./modules.md#calculateneighborhoodmean)</br>
-[View **processElevationData** function description](./modules.md#processelevationdata)</br>
+[View **calculateMeanTPI** function description](./topoModules.md#calculatemeantpi)</br>
+[View **calculateStandardizedTPI** function description](./topoModules.md#calculatestandardizedtpi)</br>
+[View **calculateNeighborhoodStdDev** function description](./topoModules.md#calculateneighborhoodstddev)</br>
+[View **calculateNeighborhoodMean** function description](./topoModules.md#calculateneighborhoodmean)</br>
+[View **processElevationData** function description](./topoModules.md#processelevationdata)</br>
 
 
 #### Heat load index
@@ -125,7 +127,7 @@ We based our heat load index (HLI) on a workflow modified by Theobald et al (201
 ```javascript
 var theobaldHLI = tt.calculateTheobaldHLI(demClipped);
 ```
-[View **theobaldHLI** function description](./modules.md#theobaldhli)
+[View **theobaldHLI** function description](./topoModules.md#theobaldhli)
 
 
 #### Landforms
@@ -133,7 +135,7 @@ Our landforms are based on the classifications developed by Theobald et al. (201
 ```javascript
 var landformsTheobald = tt.calculateLandforms(demClipped,slopeDegrees,theobaldHLI,meanTPI,tpi_270m);
 ```
-[View **calculateLandforms** function description](./modules.md#calculatelandforms)
+[View **calculateLandforms** function description](./topoModules.md#calculatelandforms)
 
 
 ## Visualize results
@@ -159,9 +161,9 @@ print(chartAll.setOptions(tt.makeChartStyle('Breakdown of output region by landf
 Map.addLayer(remappedLandforms,{min:0,max:14,palette:tt.landformsPaletteDisplay},'landforms - all')
 Map.centerObject(landformsTheobald,12)
 ```
-[View **remapLandforms** function description](./modules.md#remaplandforms)</br>
-[View **outputChart** function description](./modules.md#outputchart)</br>
-[View **makeChartStyle** function description](./modules.md#makechartstyle)
+[View **remapLandforms** function description](./topoModules.md#remaplandforms)</br>
+[View **outputChart** function description](./topoModules.md#outputchart)</br>
+[View **makeChartStyle** function description](./topoModules.md#makechartstyle)
 
 ### Simplified classes
 
@@ -185,7 +187,7 @@ print(chartSimple.setOptions(tt.makeChartStyle('Breakdown of output region by la
 Map.addLayer(remappedLandformsSimple,{min:0,max:3,palette:tt.landformsSimplePaletteDisplay},'landforms - simplified')
 Map.centerObject(demClipped,12)
 ```
-[View **remapLandformsSimple** function description](./modules.md#remaplandformssimple)</br>
-[View **outputChart** function description](./modules.md#outputchart)</br>
-[View **makeChartStyle** function description](./modules.md#makechartstyle)
+[View **remapLandformsSimple** function description](./topoModules.md#remaplandformssimple)</br>
+[View **outputChart** function description](./topoModules.md#outputchart)</br>
+[View **makeChartStyle** function description](./topoModules.md#makechartstyle)
 
